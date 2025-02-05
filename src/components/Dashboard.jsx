@@ -12,7 +12,9 @@ const Dashboard = () => {
   const [formData, setFormData] = useState({
     shipmentId: '',
     containerId: '',
-    currentLocation: '',
+    latitude: '',
+    longitude: '',
+    location: '',
     currentETA: '',
     status: 'Pending'
   });
@@ -31,6 +33,7 @@ const Dashboard = () => {
   };
 
   const handleNavigation = (shipment) => {
+    console.log(shipment);
     navigate(`/shipment-location/${shipment.shipmentId}`);
   };
 
@@ -57,8 +60,19 @@ const Dashboard = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+    const newCurrentLocation = {
+      latitude: formData.latitude,
+      longitude: formData.longitude,
+      location: formData.location
+    };
+
+    const dataToSubmit = {
+      ...formData,
+      currentLocation: newCurrentLocation,
+    };
+
     try {
-      await axios.post("http://localhost:4000/shipment", formData);
+      await axios.post("http://localhost:4000/shipment", dataToSubmit);
       fetchShipments();
       setShowForm(false);
     } catch (error) {
@@ -73,7 +87,7 @@ const Dashboard = () => {
         <button onClick={() => setShowForm(true)} className="p-2 bg-blue-500 text-white rounded">Add Shipment</button>
       </div>
       <div className="flex items-center gap-4 mb-4">
-        <input type="text" placeholder="Filter by Container ID..." onChange={handleFilterChange} className="p-2 border rounded w-full" />
+        <input type="text" placeholder="Filter by Container ID..." onChange={handleFilterChange} className="p-2 border rounded w-full sm:w-1/2 lg:w-1/3" />
       </div>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse border border-gray-300">
@@ -92,11 +106,11 @@ const Dashboard = () => {
               <tr key={shipment._id} className="border text-center">
                 <td className="border p-2">{shipment.shipmentId}</td>
                 <td className="border p-2">{shipment.containerId}</td>
-                <td className="border p-2">{shipment.currentLocation}</td>
+                <td className="border p-2">{shipment.currentLocation.location}</td>
                 <td className="border p-2">{new Date(shipment.currentETA).toLocaleDateString()}</td>
                 <td className="border p-2">{shipment.status}</td>
                 <td className="border p-2">
-                  <button className="p-2 bg-blue-500 text-white rounded" onClick={()=>{handleNavigation(shipment)}}>Check/Edit</button>
+                  <button className="p-2 bg-blue-500 text-white rounded" onClick={() => { handleNavigation(shipment) }}>Check/Edit</button>
                 </td>
               </tr>
             ))}
@@ -105,30 +119,56 @@ const Dashboard = () => {
       </div>
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-h-screen overflow-auto">
             <h2 className="text-xl font-bold mb-4">Add Shipment</h2>
             <form onSubmit={handleFormSubmit} className="space-y-3">
-              <label htmlFor="shipmentId" className="block text-sm font-medium text-gray-700">Shipment ID</label>
-              <input name="shipmentId" placeholder="Shipment ID" required onChange={handleFormChange} className="p-2 border rounded w-full" />
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label htmlFor="shipmentId" className="block text-sm font-medium text-gray-700">Shipment ID</label>
+                  <input name="shipmentId" placeholder="Shipment ID" required onChange={handleFormChange} className="p-2 border rounded w-full" />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="containerId" className="block text-sm font-medium text-gray-700">Container ID</label>
+                  <input name="containerId" placeholder="Container ID" required onChange={handleFormChange} className="p-2 border rounded w-full" />
+                </div>
+              </div>
 
-              <label htmlFor="containerId" className="block text-sm font-medium text-gray-700">Container ID</label>
-              <input name="containerId" placeholder="Container ID" required onChange={handleFormChange} className="p-2 border rounded w-full" />
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label htmlFor="latitude" className="block text-sm font-medium text-gray-700">Latitude</label>
+                  <input name="latitude" type="text" required onChange={handleFormChange} className="p-2 border rounded w-full" />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="longitude" className="block text-sm font-medium text-gray-700">Longitude</label>
+                  <input name="longitude" type="text" required onChange={handleFormChange} className="p-2 border rounded w-full" />
+                </div>
+              </div>
 
-              <label htmlFor="currentLocation" className="block text-sm font-medium text-gray-700">Current Location</label>
-              <input name="currentLocation" placeholder="Current Location" required onChange={handleFormChange} className="p-2 border rounded w-full" />
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
+                  <input name="location" placeholder="Current Location" required onChange={handleFormChange} className="p-2 border rounded w-full" />
+                </div>
+                <div className="flex-1">
+                  <label htmlFor="currentETA" className="block text-sm font-medium text-gray-700">ETA</label>
+                  <input name="currentETA" type="date" required onChange={handleFormChange} className="p-2 border rounded w-full" />
+                </div>
+              </div>
 
-              <label htmlFor="currentETA" className="block text-sm font-medium text-gray-700">ETA</label>
-              <input name="currentETA" type="date" required onChange={handleFormChange} className="p-2 border rounded w-full" />
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status</label>
+                  <select name="status" onChange={handleFormChange} className="p-2 border rounded w-full">
+                    <option value="Pending">Pending</option>
+                    <option value="In Transit">In Transit</option>
+                    <option value="Delayed">Delayed</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </div>
+              </div>
 
-              <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status</label>
-              <select name="status" onChange={handleFormChange} className="p-2 border rounded w-full">
-                <option value="Pending">Pending</option>
-                <option value="In Transit">In Transit</option>
-                <option value="Delayed">Delayed</option>
-                <option value="Delivered">Delivered</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
-              <div className="flex justify-between">
+              <div className="flex justify-between mt-4">
                 <button onClick={() => setShowForm(false)} className="p-2 bg-red-500 text-white rounded">Cancel</button>
                 <button type="submit" className="p-2 bg-green-500 text-white rounded">Add</button>
               </div>
@@ -136,6 +176,8 @@ const Dashboard = () => {
           </div>
         </div>
       )}
+
+
     </div>
   );
 };
