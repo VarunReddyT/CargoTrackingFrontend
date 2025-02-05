@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
   const [shipments, setShipments] = useState([]);
@@ -7,6 +8,7 @@ const Dashboard = () => {
   const [sortField, setSortField] = useState('');
   const [sortOrder, setSortOrder] = useState('asc');
   const [showForm, setShowForm] = useState(false);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     shipmentId: '',
     containerId: '',
@@ -26,6 +28,10 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error fetching shipments', error);
     }
+  };
+
+  const handleNavigation = (shipment) => {
+    navigate(`/shipment-location/${shipment.shipmentId}`);
   };
 
   const handleFilterChange = (e) => {
@@ -62,10 +68,12 @@ const Dashboard = () => {
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-2xl font-bold mb-4">Shipment Dashboard</h2>
+      <div className='flex justify-between items-center mb-4'>
+        <h2 className="text-2xl font-bold mb-4">Cargo Shipment Dashboard</h2>
+        <button onClick={() => setShowForm(true)} className="p-2 bg-blue-500 text-white rounded">Add Shipment</button>
+      </div>
       <div className="flex items-center gap-4 mb-4">
         <input type="text" placeholder="Filter by Container ID..." onChange={handleFilterChange} className="p-2 border rounded w-full" />
-        <button onClick={() => setShowForm(true)} className="p-2 bg-blue-500 text-white rounded">Add Shipment</button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse border border-gray-300">
@@ -76,6 +84,7 @@ const Dashboard = () => {
               <th className="border p-2 cursor-pointer" onClick={() => handleSort('currentLocation')}>Current Location</th>
               <th className="border p-2 cursor-pointer" onClick={() => handleSort('currentETA')}>ETA</th>
               <th className="border p-2 cursor-pointer" onClick={() => handleSort('status')}>Status</th>
+              <th className="border p-2 cursor-pointer">Location</th>
             </tr>
           </thead>
           <tbody>
@@ -86,6 +95,9 @@ const Dashboard = () => {
                 <td className="border p-2">{shipment.currentLocation}</td>
                 <td className="border p-2">{new Date(shipment.currentETA).toLocaleDateString()}</td>
                 <td className="border p-2">{shipment.status}</td>
+                <td className="border p-2">
+                  <button className="p-2 bg-blue-500 text-white rounded" onClick={()=>{handleNavigation(shipment)}}>Check/Edit</button>
+                </td>
               </tr>
             ))}
           </tbody>
