@@ -71,7 +71,6 @@ const ShipmentMap = () => {
               center={mapCenter}
               zoom={15}
               style={{ height: '100vh', width: '100%' }}
-              scrollWheelZoom={false}
             >
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
               {currentLocation && currentLocation.latitude && currentLocation.longitude && (

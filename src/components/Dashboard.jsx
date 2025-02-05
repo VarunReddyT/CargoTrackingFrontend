@@ -87,7 +87,7 @@ const Dashboard = () => {
         <button onClick={() => setShowForm(true)} className="p-2 bg-blue-500 text-white rounded">Add Shipment</button>
       </div>
       <div className="flex items-center gap-4 mb-4">
-        <input type="text" placeholder="Filter by Container ID..." onChange={handleFilterChange} className="p-2 border rounded w-full sm:w-1/2 lg:w-1/3" />
+        <input type="text" placeholder="Filter by Shipment ID..." onChange={handleFilterChange} className="p-2 border rounded w-full sm:w-1/2 lg:w-1/3" />
       </div>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse border border-gray-300">
